@@ -91,7 +91,7 @@ export default function ChatbotBookingForm({ onClose, onSuccess }: ChatbotBookin
 
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true)
-    
+
     try {
       if (!isWithinServiceArea(data.address)) {
         toast.error(`Bookings are limited to ${SERVICE_AREA_LABEL}. Please provide a Cebu-based address.`)
@@ -100,7 +100,7 @@ export default function ChatbotBookingForm({ onClose, onSuccess }: ChatbotBookin
 
       const bookingDate = new Date(data.date)
       const validation = validateBookingDateTime(bookingDate, data.time)
-      
+
       if (!validation.valid) {
         toast.error(validation.error || 'Invalid booking time')
         return
@@ -112,9 +112,106 @@ export default function ChatbotBookingForm({ onClose, onSuccess }: ChatbotBookin
         timestamp: new Date(),
       }
 
+      // Save to Firestore
       await addDoc(collection(db, 'bookings'), bookingData)
-      
-      toast.success('Booking submitted successfully! We will confirm your appointment soon.')
+
+      // Send confirmation email to user
+      const userEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #14b8a6; text-align: center;">Booking Confirmation - Suretech Network</h1>
+          <p>Dear ${data.name},</p>
+          <p>Thank you for booking with Suretech Network and Data Solution! We have received your appointment request and are processing it.</p>
+
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>📅 Booking Details:</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+            <p><strong>Service:</strong> ${services.find(s => s.id === data.service)?.name || data.service}</p>
+            <p><strong>Location:</strong> ${data.location}</p>
+            <p><strong>Address:</strong> ${data.address}</p>
+            <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
+            <p><strong>Time:</strong> ${data.time}</p>
+            ${data.message ? `<p><strong>Notes:</strong> ${data.message}</p>` : ''}
+            ${data.tip > 0 ? `<p><strong>Tip:</strong> ₱${data.tip}</p>` : ''}
+          </div>
+
+          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+            <h3>⏰ Next Steps:</h3>
+            <p>• Our team will review your booking request within 24 hours</p>
+            <p>• You will receive a confirmation email with final details</p>
+            <p>• A representative may call you to confirm details</p>
+            <p>• For urgent matters, contact us directly</p>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+            <p><strong>📞 Contact Information:</strong></p>
+            <p>Phone: 0970 210 1773 / 0956 703 1254</p>
+            <p>Email: suretechnetworkanddatasolution@gmail.com</p>
+          </div>
+
+          <p>If you need to make changes to your booking or have any questions, please don't hesitate to contact us.</p>
+          <p>Thank you for choosing Suretech Network!</p>
+          <p>Best regards,<br>The Suretech Network Team</p>
+        </div>
+      `
+
+      // Send notification email to company
+      const companyEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #14b8a6;">New Booking Request</h1>
+          <p>A new appointment has been booked through the chatbot.</p>
+
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Booking Details:</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+            <p><strong>Service:</strong> ${services.find(s => s.id === data.service)?.name || data.service}</p>
+            <p><strong>Location Type:</strong> ${data.location}</p>
+            <p><strong>Address:</strong> ${data.address}</p>
+            <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
+            <p><strong>Time:</strong> ${data.time}</p>
+            <p><strong>Message:</strong> ${data.message || 'No additional notes'}</p>
+            <p><strong>Tip:</strong> ₱${data.tip || 0}</p>
+            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+
+          <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+            <p><strong>⚡ Action Required:</strong> Confirm this booking within 24 hours and send confirmation email to customer.</p>
+          </div>
+
+          <p>Customer contact: <a href="mailto:${data.email}">${data.email}</a> | <a href="tel:${data.phone}">${data.phone}</a></p>
+        </div>
+      `
+
+      // Send emails
+      const [userEmailResponse, companyEmailResponse] = await Promise.all([
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: data.email,
+            subject: 'Booking Confirmation - Suretech Network',
+            html: userEmailHtml,
+          }),
+        }),
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: 'suretechnetworkanddatasolution@gmail.com',
+            subject: `New Booking: ${data.name} - ${new Date(data.date).toLocaleDateString()}`,
+            html: companyEmailHtml,
+          }),
+        })
+      ])
+
+      if (!userEmailResponse.ok || !companyEmailResponse.ok) {
+        console.warn('Email sending failed, but booking was saved to database')
+      }
+
+      toast.success('Booking submitted successfully! Check your email for confirmation details.')
       onSuccess()
     } catch (error) {
       console.error('Error submitting booking:', error)

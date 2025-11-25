@@ -63,16 +63,102 @@ export default function ContactPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     try {
+      // Save to Firestore
       await addDoc(collection(db, 'inquiries'), {
         ...data,
         timestamp: new Date(),
         status: 'new',
       })
-      
-      toast.success('Message sent successfully!')
+
+      // Send confirmation email to user
+      const userEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #14b8a6; text-align: center;">Thank You for Contacting Suretech Network</h1>
+          <p>Dear ${data.name},</p>
+          <p>Thank you for reaching out to Suretech Network and Data Solution. We have received your message regarding "${data.subject}" and appreciate your interest in our services.</p>
+
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Your Message Details:</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
+            <p><strong>Subject:</strong> ${data.subject}</p>
+            <p><strong>Message:</strong></p>
+            <div style="background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #14b8a6;">
+              ${data.message.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+
+          <p>Our team will review your inquiry and get back to you within 24 hours. If you have any additional information or urgent questions, please feel free to contact us directly:</p>
+
+          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+            <p><strong>📞 Phone:</strong> 0970 210 1773 / 0956 703 1254</p>
+            <p><strong>📧 Email:</strong> suretechnetworkanddatasolution@gmail.com</p>
+            <p><strong>📍 Location:</strong> Tulay Minglanilla, Cebu, Philippines</p>
+          </div>
+
+          <p>Thank you for choosing Suretech Network. We look forward to assisting you!</p>
+          <p>Best regards,<br>The Suretech Network Team</p>
+        </div>
+      `
+
+      // Send notification email to company
+      const companyEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #14b8a6;">New Contact Form Submission</h1>
+          <p>You have received a new inquiry through your website contact form.</p>
+
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Contact Details:</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
+            <p><strong>Subject:</strong> ${data.subject}</p>
+            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Message:</strong></p>
+            <div style="background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #14b8a6;">
+              ${data.message.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+            <p><strong>⚡ Action Required:</strong> Please respond to this inquiry within 24 hours.</p>
+          </div>
+
+          <p>Reply directly to: <a href="mailto:${data.email}">${data.email}</a></p>
+        </div>
+      `
+
+      // Send emails
+      const [userEmailResponse, companyEmailResponse] = await Promise.all([
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: data.email,
+            subject: 'Thank You for Contacting Suretech Network',
+            html: userEmailHtml,
+          }),
+        }),
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: 'suretechnetworkanddatasolution@gmail.com',
+            subject: `New Contact Form: ${data.subject}`,
+            html: companyEmailHtml,
+          }),
+        })
+      ])
+
+      if (!userEmailResponse.ok || !companyEmailResponse.ok) {
+        console.warn('Email sending failed, but form was saved to database')
+      }
+
+      toast.success('Message sent successfully! Check your email for confirmation.')
       setIsSuccess(true)
       reset()
-      
+
       setTimeout(() => setIsSuccess(false), 5000)
     } catch (error) {
       console.error('Error submitting form:', error)
