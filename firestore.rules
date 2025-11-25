@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to create inquiries, but only authenticated users can read/update/delete
+    match /inquiries/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    
+    // Bookings collection - anyone can create, authenticated users can read/update/delete
+    match /bookings/{document=**} {
+      allow create: if true;
+      allow read: if request.auth != null || resource.data.email == request.auth.token.email;
+      allow update, delete: if request.auth != null;
+    }
+    
+    // Reviews collection - anyone can create and read, authenticated users can update/delete their own
+    match /reviews/{document=**} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Add more rules as needed for other collections
+  }
+}
+
