@@ -98,6 +98,10 @@ CONTACT INFORMATION:
 - Email: suretechnetworkanddatasolution@gmail.com
 - Social Media: Facebook, Instagram, TikTok - Suretech Network and Data Solution
 
+SERVICE COVERAGE:
+- Onsite services available within Cebu Province, Philippines (Cebu City, Mandaue, Lapu-Lapu, Talisay, Minglanilla, Consolacion, and nearby areas)
+- Remote consultations and diagnostics offered nationwide upon request
+
 WHY CHOOSE US:
 - Proven track record in system installation and network maintenance
 - Customized and cost-effective solutions tailored to your needs

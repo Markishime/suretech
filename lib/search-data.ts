@@ -9,7 +9,7 @@ export const searchIndex: SearchItem[] = [
   {
     title: 'Home',
     href: '/',
-    description: 'Overview of Suretech Network & Data Solution with services, testimonials, and CTA.',
+    description: 'Overview of Suretech Network & Data Solution with services, capabilities, and CTA.',
     tags: ['landing', 'overview', 'hero', 'stats'],
   },
   {
@@ -75,8 +75,8 @@ export const searchIndex: SearchItem[] = [
   {
     title: 'Reviews',
     href: '/reviews',
-    description: 'Customer testimonials and experience sharing from successful projects.',
-    tags: ['reviews', 'feedback', 'testimonials'],
+    description: 'Customer reviews and experience sharing from successful projects.',
+    tags: ['reviews', 'feedback', 'ratings'],
   },
   {
     title: 'Referral Program',

@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { collection, addDoc } from 'firebase/firestore'
 import { db } from './firebase'
-import { validateBookingDateTime, WORKING_HOURS, type BookingData } from './booking'
+import { validateBookingDateTime, WORKING_HOURS, type BookingData, isWithinServiceArea, SERVICE_AREA_LABEL } from './booking'
 
 // Initialize with empty string, will be set when API key is available
 const getGenAI = () => {
@@ -29,6 +29,10 @@ Location: Tulay Minglanilla, Cebu, Philippines
 Contact: 
 - Phone: 0970 210 1773 / 0956 703 1254
 - Email: suretechnetworkanddatasolution@gmail.com
+
+Service Coverage:
+- Onsite services available within Cebu Province, Philippines (Cebu City, Mandaue, Lapu-Lapu, Talisay, Minglanilla, Consolacion, and nearby areas)
+- Remote diagnostics and consultations offered nationwide upon request
 
 Booking Information:
 - Bookings are only accepted during working hours (Monday-Friday, 8 AM - 6 PM)
@@ -177,7 +181,7 @@ export async function processBookingViaChat(
     
     // Handle booking intent
     return {
-      response: 'I can help you book a service! To complete your booking, I need a few details:\n\n' +
+      response: 'I can help you book a service within Cebu Province, Philippines! To complete your booking, I need a few details:\n\n' +
                 '1. Your full name\n' +
                 '2. Your email address\n' +
                 '3. Your phone number\n' +
@@ -192,7 +196,7 @@ export async function processBookingViaChat(
   } catch (error) {
     console.error('Error processing booking chat:', error)
     return {
-      response: 'I\'d be happy to help you book a service! 📅 For the best booking experience, please click the "Book Appointment" button below or visit our booking page. You can also contact us directly:\n\n📞 Phone: 0970 210 1773 / 0956 703 1254\n📧 Email: suretechnetworkanddatasolution@gmail.com\n\nWe\'re here to help!',
+      response: 'I\'d be happy to help you book a service! 📅 For the best booking experience, please click the "Book Appointment" button below or visit our booking page. You can also contact us directly:\n\n📞 Phone: 0970 210 1773 / 0956 703 1254\n📧 Email: suretechnetworkanddatasolution@gmail.com\n\nPlease note: onsite services are currently available within Cebu Province, Philippines. We\'re here to help!'
     }
   }
 }
@@ -207,6 +211,13 @@ export async function createBookingFromChat(bookingData: Partial<BookingData>): 
       return {
         success: false,
         message: `Missing required fields: ${missing.join(', ')}`,
+      }
+    }
+    
+    if (!isWithinServiceArea(bookingData.address as string)) {
+      return {
+        success: false,
+        message: `We currently provide onsite services within ${SERVICE_AREA_LABEL}. Please share a Cebu-based address or contact us for remote support options.`,
       }
     }
     

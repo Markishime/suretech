@@ -55,7 +55,10 @@ export default function SupportPage() {
             Direct Access to <span className="text-gradient">Suretech Engineers</span>
           </h1>
           <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-            Whether it’s a critical network event or a scheduled optimization, our support pod keeps your infrastructure online, secure, and future-ready.
+            Whether it’s a critical network event or a scheduled optimization, our Cebu-based support pod keeps your infrastructure online, secure, and future-ready.
+          </p>
+          <p className="text-xs uppercase tracking-[0.4em] text-primary-300">
+            Cebu Province coverage · Remote diagnostics nationwide
           </p>
         </motion.div>
 

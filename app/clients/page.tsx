@@ -141,27 +141,6 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      {/* Testimonials Placeholder */}
-      <section className="relative py-20 px-4 bg-dark-900/50">
-        <div className="container mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-8"
-          >
-            <h2 className="text-4xl lg:text-5xl font-bold text-white">
-              Client <span className="text-gradient">Testimonials</span>
-            </h2>
-            <div className="glass-effect rounded-xl p-12 max-w-3xl mx-auto">
-              <p className="text-gray-400 italic text-lg">
-                &quot;We&apos;re proud to serve clients across various industries. Testimonials coming soon!&quot;
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="relative py-20 px-4">
         <div className="container mx-auto text-center space-y-8">

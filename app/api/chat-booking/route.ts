@@ -19,6 +19,10 @@ Contact:
 - Phone: 0970 210 1773 / 0956 703 1254
 - Email: suretechnetworkanddatasolution@gmail.com
 
+Service Coverage:
+- Onsite services available within Cebu Province, Philippines (Cebu City, Mandaue, Lapu-Lapu, Talisay, Minglanilla, Consolacion, and nearby areas)
+- Remote consultations and diagnostics offered nationwide upon request
+
 Booking Information:
 - Bookings are only accepted during working hours (Monday-Friday, 8 AM - 6 PM)
 - Customers can provide optional tips/compensation

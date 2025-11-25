@@ -102,3 +102,22 @@ export function validateBookingDateTime(date: Date, time: string): { valid: bool
   return { valid: true }
 }
 
+const SERVICE_AREA_KEYWORDS = [
+  'cebu',
+  'cebu city',
+  'mandaue',
+  'lapu-lapu',
+  'lapu lapu',
+  'minglanilla',
+  'talisay',
+  'consolacion',
+]
+
+export const SERVICE_AREA_LABEL = 'Cebu Province, Philippines'
+
+export function isWithinServiceArea(address: string): boolean {
+  if (!address) return false
+  const normalized = address.toLowerCase()
+  return SERVICE_AREA_KEYWORDS.some((keyword) => normalized.includes(keyword))
+}
+

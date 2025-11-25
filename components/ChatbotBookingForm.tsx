@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Calendar, Clock, MapPin, Wrench, DollarSign, X, CheckCircle, Send } from 'lucide-react'
-import { generateTimeSlots, validateBookingDateTime, formatBookingDate, type BookingData } from '@/lib/booking'
+import { generateTimeSlots, validateBookingDateTime, formatBookingDate, type BookingData, isWithinServiceArea, SERVICE_AREA_LABEL } from '@/lib/booking'
 import toast from 'react-hot-toast'
 
 const services = [
@@ -93,6 +93,11 @@ export default function ChatbotBookingForm({ onClose, onSuccess }: ChatbotBookin
     setIsSubmitting(true)
     
     try {
+      if (!isWithinServiceArea(data.address)) {
+        toast.error(`Bookings are limited to ${SERVICE_AREA_LABEL}. Please provide a Cebu-based address.`)
+        return
+      }
+
       const bookingDate = new Date(data.date)
       const validation = validateBookingDateTime(bookingDate, data.time)
       
@@ -246,6 +251,9 @@ export default function ChatbotBookingForm({ onClose, onSuccess }: ChatbotBookin
                   placeholder="Street address, City, Province"
                 />
                 {errors.address && <p className="mt-1 text-xs text-red-400">{errors.address.message}</p>}
+                <p className="mt-1 text-[10px] uppercase tracking-[0.4em] text-primary-300">
+                  {SERVICE_AREA_LABEL} addresses only
+                </p>
               </div>
 
               <div className="flex gap-2">
