@@ -9,7 +9,7 @@ const getGenAI = () => {
   if (!apiKey || apiKey.trim() === '') {
     throw new Error('Gemini API key not configured')
   }
-  return new GoogleGenerativeAI(apiKey, { apiVersion: 'v1beta' })
+  return new GoogleGenerativeAI(apiKey)
 }
 
 const knowledgeBase = `

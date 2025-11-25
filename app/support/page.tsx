@@ -72,17 +72,20 @@ export default function SupportPage() {
               <motion.a
                 key={channel.title}
                 href={channel.href}
-                className="glass-effect rounded-2xl p-6 space-y-4 block hover:-translate-y-2 transition-transform"
+                className="glass-effect rounded-2xl p-6 flex flex-col space-y-4 hover:-translate-y-2 transition-transform border border-primary-500/10"
                 variants={staggerItem}
               >
-                <div className="bg-primary-500/10 rounded-xl p-4 w-fit">
+                <div className="bg-primary-500/10 rounded-xl p-4 w-fit shadow-inner shadow-primary-900/20">
                   <Icon className="w-6 h-6 text-primary-400" />
                 </div>
-                <div>
-                  <p className="text-sm uppercase tracking-widest text-primary-300">{channel.title}</p>
-                  <p className="text-white text-2xl font-semibold mt-1">{channel.value}</p>
+                <div className="space-y-1">
+                  <p className="text-sm uppercase tracking-[0.4em] text-primary-300">{channel.title}</p>
+                  <p className="text-white text-2xl font-semibold break-words">{channel.value}</p>
                 </div>
-                <p className="text-gray-400 text-sm">{channel.description}</p>
+                <p className="text-gray-400 text-sm leading-relaxed flex-1">{channel.description}</p>
+                <span className="inline-flex items-center text-xs text-primary-300 uppercase tracking-[0.4em]">
+                  Tap to connect
+                </span>
               </motion.a>
             )
           })}
@@ -113,12 +116,17 @@ export default function SupportPage() {
 
           <div className="space-y-4">
             {responseMatrix.map((row) => (
-              <div key={row.label} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border border-primary-500/10 rounded-2xl p-4">
-                <div>
+              <div
+                key={row.label}
+                className="flex flex-col md:flex-row md:items-center gap-4 border border-primary-500/10 rounded-2xl p-4 bg-dark-900/40"
+              >
+                <div className="flex-1 space-y-1">
                   <p className="text-white font-semibold">{row.label}</p>
-                  <p className="text-gray-400 text-sm">{row.detail}</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">{row.detail}</p>
                 </div>
-                <div className="text-primary-300 font-semibold text-lg">{row.sla}</div>
+                <div className="text-primary-300 font-semibold text-lg md:text-right tracking-wide">
+                  {row.sla}
+                </div>
               </div>
             ))}
           </div>
@@ -130,7 +138,7 @@ export default function SupportPage() {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 gap-6"
         >
-          <motion.div className="glass-effect rounded-2xl p-8 space-y-4" whileHover={{ y: -6 }}>
+          <motion.div className="glass-effect rounded-2xl p-8 space-y-4 h-full flex flex-col" whileHover={{ y: -6 }}>
             <div className="flex items-center space-x-3">
               <Headphones className="w-8 h-8 text-primary-400" />
               <h3 className="text-white text-2xl font-semibold">Proactive Monitoring</h3>
@@ -140,7 +148,7 @@ export default function SupportPage() {
             </p>
           </motion.div>
 
-          <motion.div className="glass-effect rounded-2xl p-8 space-y-4" whileHover={{ y: -6 }}>
+          <motion.div className="glass-effect rounded-2xl p-8 space-y-4 h-full flex flex-col" whileHover={{ y: -6 }}>
             <div className="flex items-center space-x-3">
               <LifeBuoy className="w-8 h-8 text-primary-400" />
               <h3 className="text-white text-2xl font-semibold">Knowledge + Playbooks</h3>

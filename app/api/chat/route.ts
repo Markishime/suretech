@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
       maxOutputTokens: 2048,
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey, { apiVersion: 'v1beta' })
+    const genAI = new GoogleGenerativeAI(apiKey)
 
     // Try available Gemini models
     const availableModels = ['gemini-2.5-pro', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro']
